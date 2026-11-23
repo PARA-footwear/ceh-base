@@ -11,7 +11,7 @@ MAX_SIZE = 800                       # Размер по длинной стор
 JPEG_QUALITY = 80                    # Качество сжатия (оптимально для телефона)
 VALID_EXTS = {".jpg", ".jpeg", ".png", ".webp"}
 
-# Стоп-слова в названии файла или подпапки (регистр не важен) — такие файлы пропускаем
+# Стоп-слова в названии файла (регистр не важен) — такие файлы пропускаем
 IGNORE_KEYWORDS = {
     "gemini_generated",
     "generated",
@@ -25,7 +25,7 @@ IGNORE_KEYWORDS = {
 
 
 def is_ai_generated(file_path: Path) -> bool:
-    """Проверяет, есть ли стоп-слова в имени файла или родительских папок."""
+    """Проверяет, есть ли стоп-слова в имени файла."""
     full_name_lower = file_path.name.lower()
     return any(kw in full_name_lower for kw in IGNORE_KEYWORDS)
 
@@ -45,6 +45,10 @@ def process_models():
     # Проходим по всем папкам моделей
     for folder in sorted(src_path.iterdir()):
         if not folder.is_dir():
+            continue
+
+        # Игнорируем любые папки, название которых начинается с нижнего подчеркивания "_"
+        if folder.name.startswith("_"):
             continue
 
         article = folder.name.strip()
